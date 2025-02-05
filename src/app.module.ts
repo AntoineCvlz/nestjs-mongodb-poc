@@ -6,7 +6,7 @@ import { UsersModule } from './users/users.module';
   imports: [
     TypeOrmModule.forRoot({
       type: 'mongodb',
-      url: 'mongodb://admin:adminpassword@localhost:27017/nest-js-mongodb-poq?authSource=admin',
+      url: 'mongodb://admin:adminpassword@mongodb:27017/nest-js-mongodb-poq?authSource=admin',
       database: 'nest-js-mongodb-poq',
       useUnifiedTopology: true,
       entities: [__dirname + '/**/*.entity{.ts,.js}'],
