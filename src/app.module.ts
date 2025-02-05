@@ -1,6 +1,7 @@
 import { Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { UsersModule } from './users/users.module';
+import { PositionsUserModule } from './positions-user/positions-user.module';
 
 @Module({
   imports: [
@@ -13,6 +14,7 @@ import { UsersModule } from './users/users.module';
       synchronize: true, // ⚠️ Mettre à `false` en production
     }),
     UsersModule,
+    PositionsUserModule,
   ],
 })
 export class AppModule {}
