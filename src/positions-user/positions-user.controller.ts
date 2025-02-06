@@ -1,7 +1,18 @@
-import { Body, Controller, Delete, Get, Param, Post } from '@nestjs/common';
+import {
+  Body,
+  Controller,
+  Delete,
+  Get,
+  Param,
+  Patch,
+  Post,
+  Query,
+} from '@nestjs/common';
 import { PositionsUserService } from './positions-user.service';
 import { CreatePositionsUserDto } from './dto/create-positions-user.dto';
 import { PositionsUser } from './positions-user.entity';
+import { FilterPositionsUserDto } from './dto/filter-positions-user.dto';
+import { UpdatePositionsUserDto } from './dto/update-positions-user.dto';
 
 @Controller('positions-user')
 export class PositionsUserController {
@@ -15,8 +26,23 @@ export class PositionsUserController {
   }
 
   @Get()
-  async findAll(): Promise<PositionsUser[]> {
-    return this.positionsUserService.findAll();
+  async findAll(
+    @Query() filterDto: FilterPositionsUserDto,
+  ): Promise<PositionsUser[]> {
+    return this.positionsUserService.findAll(filterDto);
+  }
+
+  @Get(':id')
+  async findOne(@Param('id') id: string): Promise<PositionsUser> {
+    return this.positionsUserService.findOne(id);
+  }
+
+  @Patch(':id')
+  async update(
+    @Param('id') id: string,
+    @Body() updateDto: UpdatePositionsUserDto,
+  ): Promise<PositionsUser> {
+    return this.positionsUserService.update(id, updateDto);
   }
 
   @Delete(':id')

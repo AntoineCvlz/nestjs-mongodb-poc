@@ -1,19 +1,12 @@
-import {
-  IsArray,
-  IsEnum,
-  IsNotEmpty,
-  IsNumber,
-  IsOptional,
-  IsString,
-  Validate,
-} from 'class-validator';
+import { IsOptional, IsNumber, IsString, IsEnum, IsArray, Validate, IsNotEmpty } from 'class-validator';
 import { IsValidLivreurId } from '../validators/is-valid-livreur-id';
 
-export class CreatePositionsUserDto {
+export class UpdatePositionsUserDto {
+  @IsOptional()
   @IsString()
   @IsNotEmpty()
   // @Validate(IsValidLivreurId)
-  livreur_id: string;
+  livreur_id?: string;
 
   @IsNotEmpty()
   location: {

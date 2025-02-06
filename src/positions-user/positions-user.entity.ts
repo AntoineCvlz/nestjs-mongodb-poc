@@ -5,7 +5,7 @@ export class PositionsUser {
   @ObjectIdColumn()
   _id: ObjectId;
 
-  @ObjectIdColumn()
+  @Column()
   livreur_id: string;
 
   @Column({ type: 'json' }) // A verif
