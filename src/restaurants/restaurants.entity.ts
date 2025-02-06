@@ -11,6 +11,6 @@ export class Restaurants {
   @Column({ type: 'json' })
   location: {
     type: 'Point';
-    coordinates: [number, number];
+    coordinates: [number, number]; // [longitude, latitude]
   };
 }

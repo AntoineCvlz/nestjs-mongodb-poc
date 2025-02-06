@@ -3,6 +3,8 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { Restaurants } from './restaurants.entity';
 import { CreateRestaurantsDto } from './dto/create-restaurants-dto';
+import { MongoRepository } from 'typeorm';
+import { ObjectId } from 'mongodb';
 import { FilterRestaurantsDto } from './dto/filter-restaurants-dto';
 
 @Injectable()
@@ -12,44 +14,54 @@ export class RestaurantsService {
     private restaurantsRepository: Repository<Restaurants>,
   ) {}
 
-  async create(createUserDto: CreateRestaurantsDto): Promise<Restaurants> {
-    const user = this.restaurantsRepository.create(createUserDto);
-    return this.restaurantsRepository.save(user);
+  async create(
+    createRestaurantsDto: CreateRestaurantsDto,
+  ): Promise<Restaurants> {
+    const restaurant = this.restaurantsRepository.create(createRestaurantsDto);
+    return this.restaurantsRepository.save(restaurant);
   }
 
   async findAll(): Promise<Restaurants[]> {
     return this.restaurantsRepository.find();
   }
 
-  async findRestaurantByLocation(
-    filterDto: FilterRestaurantsDto,
-  ): Promise<Restaurants[]> {
-    const { location } = filterDto;
-
-    if (!location || location.length !== 2) {
-      throw new Error(
-        'Invalid location format. Expected [latitude, longitude]',
-      );
-    }
-
-    const [latitude, longitude] = location;
-
-    return this.restaurantsRepository
-      .createQueryBuilder('restaurant')
-      .where(
-        `
-                ST_DWithin(
-                    ST_SetSRID(ST_MakePoint(restaurant.longitude, restaurant.latitude), 4326),
-                    ST_SetSRID(ST_MakePoint(:longitude, :latitude), 4326),
-                    5000  -- Rayon de recherche en mètres (ici 5km)
-                )
-            `,
-        { latitude, longitude },
-      )
-      .getMany();
-  }
-
   async delete(id: string): Promise<void> {
     await this.restaurantsRepository.delete(id);
+  }
+
+  async findNearbyRestaurants(
+    filterRestaurantsDto: FilterRestaurantsDto,
+  ): Promise<Restaurants[]> {
+    const { location, radius } = filterRestaurantsDto;
+    const distanceInMeters = radius * 1000; // Convertir x km en mètres
+
+    // Accéder au MongoRepository directement
+    const mongoRepository =
+      this.restaurantsRepository.manager.connection.getMongoRepository(
+        Restaurants,
+      );
+      
+
+    const restaurants = await mongoRepository
+      .aggregate([
+        {
+          $geoNear: {
+            near: { type: 'Point', coordinates: location }, // [longitude, latitude]
+            distanceField: 'distance',
+            spherical: true,
+            maxDistance: distanceInMeters, // Recherche dans un rayon de x mètres
+          },
+        },
+        {
+          $project: {
+            name: 1,
+            location: 1,
+            distance: { $round: ['$distance', 0] }, // Afficher la distance pour chaque restaurant
+          },
+        },
+      ])
+      .toArray();
+
+    return restaurants;
   }
 }
