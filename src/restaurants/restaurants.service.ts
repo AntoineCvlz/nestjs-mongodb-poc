@@ -3,8 +3,6 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { Restaurants } from './restaurants.entity';
 import { CreateRestaurantsDto } from './dto/create-restaurants-dto';
-import { MongoRepository } from 'typeorm';
-import { ObjectId } from 'mongodb';
 import { FilterRestaurantsDto } from './dto/filter-restaurants-dto';
 
 @Injectable()
